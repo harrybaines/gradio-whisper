@@ -32,7 +32,13 @@ def convert(url):
     filepath = download_video(url)
     return transcribe(filepath)
 
-demo = gr.Interface(fn=convert, inputs="text", outputs="file", allow_flagging=False)
-demo.launch()
+with gr.Blocks() as demo:
+    url_input = gr.Textbox(placeholder='Youtube video URL', label='URL')
+    transcribe_btn = gr.Button('Transcribe')
+    gr.Examples(
+        examples=["https://www.youtube.com/watch?v=ZgN7ZYUxcXM&ab_channel=LexClips"],
+        inputs=url_input
+    )
+    transcribe_btn.click(convert, inputs=url_input, outputs=[gr.File()])
 
-# About 15 secs for a 5 minute video
+demo.launch()
