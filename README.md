@@ -1,5 +1,3 @@
-# gradio-whsiper
-
 title: gradio-whsiper
 sdk: gradio
 sdk_version: 3.8.2
