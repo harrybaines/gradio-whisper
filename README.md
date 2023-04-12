@@ -9,4 +9,6 @@ app_file: app.py
 pinned: false
 ---
 
-Takes about 15 secs for a 5 minute video
+Transcribe a YouTube video URL to text using the OpenAI Whisper model.
+
+On an M2 Pro MacBook Pro with the `tiny` model, transcribing a 5 minute video takes about 12 seconds.

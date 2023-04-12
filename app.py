@@ -6,17 +6,19 @@ import os
 
 YT_MAX_MINS = 3600
 OUTPUT_DIR = './outputs'
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-model = whisper.load_model("base", device=DEVICE)
+MODEL_SIZES = list(whisper._MODELS.keys())
 
-def transcribe(filepath):
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
+
+def transcribe(filepath, model):
     result = model.transcribe(filepath)
     os.remove(filepath)
     transcription = result['text'].strip()
     filename = f'{OUTPUT_DIR}/transcription.txt'
     with open(filename, 'w') as f:
         f.write(transcription)
-    return filename
+    return transcription, filename
     
 def download_video(url):    
     try:
@@ -28,17 +30,39 @@ def download_video(url):
     except Exception as e:
         raise gr.Error("Error downloading video. Please check the URL.")
     
-def convert(url):
+def run(url, model_size):
     filepath = download_video(url)
-    return transcribe(filepath)
+    model = whisper.load_model(model_size, device=DEVICE)
+    transcription, filename = transcribe(filepath, model)
+    return transcription, filename
 
-with gr.Blocks() as demo:
-    url_input = gr.Textbox(placeholder='Youtube video URL', label='URL')
-    transcribe_btn = gr.Button('Transcribe')
+with gr.Blocks() as interface:
+    gr.Markdown(
+        """
+        # OpenAI Whisper Demo for YouTube Videos
+        Note: tiny model takes about 12 seconds to transcribe a 5 minute video.
+        """
+    )
+    with gr.Row():
+        url_input = gr.Textbox(placeholder='Youtube video URL', label='URL')
+        model_size = gr.Dropdown(choices=MODEL_SIZES, value='tiny', label="Model")
+
     gr.Examples(
-        examples=["https://www.youtube.com/watch?v=ZgN7ZYUxcXM&ab_channel=LexClips"],
+        examples=[
+            "https://www.youtube.com/watch?v=ZgN7ZYUxcXM&ab_channel=LexClips",
+            "https://www.youtube.com/shorts/ZlUj2WQ7_GE"
+        ],
         inputs=url_input
     )
-    transcribe_btn.click(convert, inputs=url_input, outputs=[gr.File()])
+    transcribe_btn = gr.Button('Transcribe')
+    
+    with gr.Row():    
+        output_transcript = gr.Textbox(lines=10, placeholder='Transcription of the video', label='Transcription')
+        transcribe_btn.click(
+            run,
+            inputs=[url_input, model_size],
+            outputs=[output_transcript, gr.File()]
+        )
+    
 
-demo.launch()
+interface.launch()
