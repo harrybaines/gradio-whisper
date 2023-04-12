@@ -9,15 +9,13 @@ app_file: app.py
 pinned: false
 ---
 
-# Gradio Whisper model for transcribing YouTube videos
+# Whisper model for transcribing YouTube videos (on Gradio)
 
 Transcribe a YouTube video URL to text using the OpenAI Whisper model.
 
 On an M2 Pro MacBook Pro with the `tiny` model, transcribing a 5 minute video takes about 12 seconds.
 
-![video](./docs/video.gif)
-
-## Setup
+View the [live site on HuggingFace](https://huggingface.co/spaces/harryb0905/gradio-whisper-yt-transcripts), or run the app locally on your machine:
 
 ```bash
 virtualenv venv --python=3.9
@@ -27,3 +25,6 @@ gradio app.py
 ```
 
 Then visit localhost:7860 in your browser.
+
+![video](./docs/video.gif)
+
